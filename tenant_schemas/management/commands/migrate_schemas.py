@@ -34,9 +34,7 @@ class Command(SyncCommon):
         if self.sync_tenant:
             if self.schema_name and self.schema_name != self.PUBLIC_SCHEMA_NAME:
                 if not schema_exists(self.schema_name):
-                    raise MigrationSchemaMissing(
-                        'Schema "{}" does not exist'.format(self.schema_name)
-                    )
+                    raise MigrationSchemaMissing(f'Schema "{self.schema_name}" does not exist')
                 else:
                     tenants = [self.schema_name]
             else:

@@ -12,4 +12,4 @@ def get_executor(codename=None):
         if klass.codename == codename:
             return klass
 
-    raise NotImplementedError('No executor with codename %s' % codename)
+    raise NotImplementedError(f'No executor with codename {codename}')

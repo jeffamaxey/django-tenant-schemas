@@ -14,18 +14,14 @@ def run_migrations(args, options, executor_codename, schema_name, allow_atomic=T
     style = color.color_style()
 
     def style_func(msg):
-        return '[%s:%s] %s' % (
-            style.NOTICE(executor_codename),
-            style.NOTICE(schema_name),
-            msg
-        )
+        return f'[{style.NOTICE(executor_codename)}:{style.NOTICE(schema_name)}] {msg}'
 
     stdout = OutputWrapper(sys.stdout)
     stdout.style_func = style_func
     stderr = OutputWrapper(sys.stderr)
     stderr.style_func = style_func
     if int(options.get('verbosity', 1)) >= 1:
-        stdout.write(style.NOTICE("=== Running migrate for schema %s" % schema_name))
+        stdout.write(style.NOTICE(f"=== Running migrate for schema {schema_name}"))
 
     connection.set_schema(schema_name)
     MigrateCommand(stdout=stdout, stderr=stderr).execute(*args, **options)
@@ -37,9 +33,6 @@ def run_migrations(args, options, executor_codename, schema_name, allow_atomic=T
     except transaction.TransactionManagementError:
         if not allow_atomic:
             raise
-
-        # We are in atomic transaction, don't close connections
-        pass
 
     connection.set_schema_to_public()
 

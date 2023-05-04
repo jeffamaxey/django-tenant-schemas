@@ -209,7 +209,9 @@ class DatabaseSchemaIntrospection(BaseDatabaseIntrospection):
             'table': table_name
         })
         field_map = {line[0]: line[1:] for line in cursor.fetchall()}
-        cursor.execute('SELECT * FROM %s LIMIT 1' % self.connection.ops.quote_name(table_name))
+        cursor.execute(
+            f'SELECT * FROM {self.connection.ops.quote_name(table_name)} LIMIT 1'
+        )
 
         return [
             FieldInfo(*(
@@ -228,11 +230,7 @@ class DatabaseSchemaIntrospection(BaseDatabaseIntrospection):
             'schema': self.connection.schema_name,
             'table': table_name
         })
-        relations = {}
-        for row in cursor.fetchall():
-            relations[row[1]] = (row[2], row[0])
-
-        return relations
+        return {row[1]: (row[2], row[0]) for row in cursor.fetchall()}
 
     def get_key_columns(self, cursor, table_name):
         cursor.execute(self._get_key_columns_query, {
@@ -271,7 +269,6 @@ class DatabaseSchemaIntrospection(BaseDatabaseIntrospection):
         one or more columns. Also retrieve the definition of expression-based
         indexes.
         """
-        constraints = {}
         # Loop over the key table, collecting things as constraints. The column
         # array must return column names in the same order in which they were
         # created
@@ -282,18 +279,21 @@ class DatabaseSchemaIntrospection(BaseDatabaseIntrospection):
             'table': table_name,
         })
 
-        for constraint, columns, kind, used_cols, options in cursor.fetchall():
-            constraints[constraint] = {
+        constraints = {
+            constraint: {
                 "columns": columns,
                 "primary_key": kind == "p",
                 "unique": kind in ["p", "u"],
-                "foreign_key": tuple(used_cols.split(".", 1)) if kind == "f" else None,
+                "foreign_key": tuple(used_cols.split(".", 1))
+                if kind == "f"
+                else None,
                 "check": kind == "c",
                 "index": False,
                 "definition": None,
                 "options": options,
             }
-
+            for constraint, columns, kind, used_cols, options in cursor.fetchall()
+        }
         # Now get indexes
         cursor.execute(self._get_index_constraints_query, {
             'schema': self.connection.schema_name,

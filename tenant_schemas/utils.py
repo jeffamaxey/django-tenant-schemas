@@ -54,10 +54,11 @@ def clean_tenant_url(url_string):
     """
     Removes the TENANT_TOKEN from a particular string
     """
-    if hasattr(settings, 'PUBLIC_SCHEMA_URLCONF'):
-        if (settings.PUBLIC_SCHEMA_URLCONF and
-                url_string.startswith(settings.PUBLIC_SCHEMA_URLCONF)):
-            url_string = url_string[len(settings.PUBLIC_SCHEMA_URLCONF):]
+    if hasattr(settings, 'PUBLIC_SCHEMA_URLCONF') and (
+        settings.PUBLIC_SCHEMA_URLCONF
+        and url_string.startswith(settings.PUBLIC_SCHEMA_URLCONF)
+    ):
+        url_string = url_string[len(settings.PUBLIC_SCHEMA_URLCONF):]
     return url_string
 
 
@@ -74,10 +75,7 @@ def remove_www(hostname):
     routing purposes. www.test.com/login/ and test.com/login/ should
     find the same tenant.
     """
-    if hostname.startswith("www."):
-        return hostname[4:]
-
-    return hostname
+    return hostname[4:] if hostname.startswith("www.") else hostname
 
 
 def django_is_in_test_mode():
@@ -95,12 +93,7 @@ def schema_exists(schema_name):
     sql = 'SELECT EXISTS(SELECT 1 FROM pg_catalog.pg_namespace WHERE LOWER(nspname) = LOWER(%s))'
     cursor.execute(sql, (schema_name, ))
 
-    row = cursor.fetchone()
-    if row:
-        exists = row[0]
-    else:
-        exists = False
-
+    exists = row[0] if (row := cursor.fetchone()) else False
     cursor.close()
 
     return exists

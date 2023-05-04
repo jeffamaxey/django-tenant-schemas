@@ -116,7 +116,7 @@ class TenantDataAndSettingsTest(BaseTestCase):
         schemas = ["auto_drop_schema1", "auto_drop_schema2"]
         for schema in schemas:
             self.assertFalse(schema_exists(schema))
-            tenant = Tenant(domain_url="%s.test.com" % schema, schema_name=schema)
+            tenant = Tenant(domain_url=f"{schema}.test.com", schema_name=schema)
             tenant.save(verbosity=BaseTestCase.get_verbosity())
             self.assertTrue(schema_exists(tenant.schema_name))
 

@@ -28,8 +28,9 @@ class BaseTestCase(TestCase):
         # a blank public schema for this set of tests.
         connection.set_schema_to_public()
         cursor = connection.cursor()
-        cursor.execute('DROP SCHEMA IF EXISTS %s CASCADE; CREATE SCHEMA %s;'
-                       % (get_public_schema_name(), get_public_schema_name()))
+        cursor.execute(
+            f'DROP SCHEMA IF EXISTS {get_public_schema_name()} CASCADE; CREATE SCHEMA {get_public_schema_name()};'
+        )
         super(BaseTestCase, cls).setUpClass()
 
     @classmethod
@@ -44,7 +45,7 @@ class BaseTestCase(TestCase):
         super(BaseTestCase, self).setUp()
 
     @classmethod
-    def get_verbosity(self):
+    def get_verbosity(cls):
         for s in reversed(inspect.stack()):
             options = s[0].f_locals.get('options')
             if isinstance(options, dict):

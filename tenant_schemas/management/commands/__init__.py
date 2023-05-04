@@ -63,9 +63,11 @@ class BaseTenantCommand(BaseCommand):
         if verbosity >= 1:
             print()
             print(
-                self.style.NOTICE("=== Switching to schema '")
-                + self.style.SQL_TABLE(tenant.schema_name)
-                + self.style.NOTICE("' then calling %s:" % command_name)
+                (
+                    self.style.NOTICE("=== Switching to schema '")
+                    + self.style.SQL_TABLE(tenant.schema_name)
+                    + self.style.NOTICE(f"' then calling {command_name}:")
+                )
             )
 
         connection.set_tenant(tenant)
@@ -125,19 +127,12 @@ https://django-tenant-schemas.readthedocs.io/en/latest/use.html#creating-a-tenan
             while True:
                 tenant_schema = input("Enter Tenant Schema ('?' to list schemas): ")
                 if tenant_schema == "?":
-                    print(
-                        "\n".join(
-                            [
-                                "%s - %s" % (t.schema_name, t.domain_url,)
-                                for t in all_tenants
-                            ]
-                        )
-                    )
+                    print("\n".join([f"{t.schema_name} - {t.domain_url}" for t in all_tenants]))
                 else:
                     break
 
         if tenant_schema not in [t.schema_name for t in all_tenants]:
-            raise CommandError("Invalid tenant schema, '%s'" % (tenant_schema,))
+            raise CommandError(f"Invalid tenant schema, '{tenant_schema}'")
 
         return TenantModel.objects.get(schema_name=tenant_schema)
 

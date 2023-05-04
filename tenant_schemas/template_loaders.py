@@ -30,8 +30,7 @@ class FilesystemLoader(filesystem.Loader):
                 template_dirs = settings.MULTITENANT_TEMPLATE_DIRS
             except AttributeError:
                 raise ImproperlyConfigured(
-                    "To use %s.%s you must define the MULTITENANT_TEMPLATE_DIRS"
-                    % (__name__, FilesystemLoader.__name__)
+                    f"To use {__name__}.{FilesystemLoader.__name__} you must define the MULTITENANT_TEMPLATE_DIRS"
                 )
 
             for template_dir in reversed(template_dirs):
@@ -43,4 +42,4 @@ class FilesystemLoader(filesystem.Loader):
                     ]
                 )
 
-        return [each for each in reversed(dirs)]
+        return list(reversed(dirs))

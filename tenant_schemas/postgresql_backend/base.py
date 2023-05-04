@@ -142,13 +142,7 @@ class DatabaseWrapper(original_backend.DatabaseWrapper):
 
             search_paths.extend(EXTRA_SEARCH_PATHS)
 
-            if name:
-                # Named cursor can only be used once
-                cursor_for_search_path = self.connection.cursor()
-            else:
-                # Reuse
-                cursor_for_search_path = cursor
-
+            cursor_for_search_path = self.connection.cursor() if name else cursor
             # In the event that an error already happened in this transaction and we are going
             # to rollback we should just ignore database error when setting the search_path
             # if the next instruction is not a rollback it will just fail also, so

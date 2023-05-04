@@ -22,7 +22,7 @@ class TenantQueryset(models.QuerySet):
             if result is not None:
                 current_counter, current_counter_dict = result
                 counter += current_counter
-                counter_dict.update(current_counter_dict)
+                counter_dict |= current_counter_dict
         if counter:
             return counter, counter_dict
 
@@ -89,7 +89,7 @@ class TenantMixin(models.Model):
 
         if schema_exists(self.schema_name) and (self.auto_drop_schema or force_drop):
             cursor = connection.cursor()
-            cursor.execute('DROP SCHEMA IF EXISTS %s CASCADE' % self.schema_name)
+            cursor.execute(f'DROP SCHEMA IF EXISTS {self.schema_name} CASCADE')
 
         return super(TenantMixin, self).delete(*args, **kwargs)
 
@@ -109,7 +109,7 @@ class TenantMixin(models.Model):
             return False
 
         # create the schema
-        cursor.execute('CREATE SCHEMA %s' % self.schema_name)
+        cursor.execute(f'CREATE SCHEMA {self.schema_name}')
 
         if sync_schema:
             call_command('migrate_schemas',

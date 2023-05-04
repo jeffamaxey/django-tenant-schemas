@@ -21,7 +21,7 @@ class AppLabelsTestCase(TestCase):
         parts = whole_name.split('.')
         name = ''
         for part in parts:
-            name += ('.%s' % part) if name else part
+            name += f'.{part}' if name else part
             module = types.ModuleType(name)
             module.__path__ = ['/tmp']
             self._modules.add(name)

@@ -19,12 +19,11 @@ class TenantTutorialMiddleware(object):
             request.urlconf = settings.PUBLIC_SCHEMA_URLCONF
             return
         except TenantModel.DoesNotExist:
-            if hostname_without_port in ("127.0.0.1", "localhost"):
-                request.urlconf = settings.PUBLIC_SCHEMA_URLCONF
-                return
-            else:
+            if hostname_without_port not in ("127.0.0.1", "localhost"):
                 raise Http404
 
+            request.urlconf = settings.PUBLIC_SCHEMA_URLCONF
+            return
         connection.set_tenant(request.tenant)
         ContentType.objects.clear_cache()
 

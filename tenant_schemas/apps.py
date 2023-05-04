@@ -62,17 +62,22 @@ def best_practice(app_configs, **kwargs):
 
     if hasattr(settings, 'PG_EXTRA_SEARCH_PATHS'):
         if get_public_schema_name() in settings.PG_EXTRA_SEARCH_PATHS:
-            errors.append(Critical(
-                "%s can not be included on PG_EXTRA_SEARCH_PATHS."
-                % get_public_schema_name()))
+            errors.append(
+                Critical(
+                    f"{get_public_schema_name()} can not be included on PG_EXTRA_SEARCH_PATHS."
+                )
+            )
 
-        # make sure no tenant schema is in settings.PG_EXTRA_SEARCH_PATHS
-        invalid_schemas = set(settings.PG_EXTRA_SEARCH_PATHS).intersection(
-            get_tenant_model().objects.all().values_list('schema_name', flat=True))
-        if invalid_schemas:
-            errors.append(Critical(
-                "Do not include tenant schemas (%s) on PG_EXTRA_SEARCH_PATHS."
-                % ", ".join(sorted(invalid_schemas))))
+        if invalid_schemas := set(settings.PG_EXTRA_SEARCH_PATHS).intersection(
+            get_tenant_model()
+            .objects.all()
+            .values_list('schema_name', flat=True)
+        ):
+            errors.append(
+                Critical(
+                    f'Do not include tenant schemas ({", ".join(sorted(invalid_schemas))}) on PG_EXTRA_SEARCH_PATHS.'
+                )
+            )
 
     if not settings.SHARED_APPS:
         errors.append(

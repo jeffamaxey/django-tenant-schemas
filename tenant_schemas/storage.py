@@ -38,8 +38,7 @@ class TenantStorageMixin(object):
         try:
             path = safe_join(location, name)
         except ValueError:
-            raise SuspiciousOperation(
-                "Attempted access to '%s' denied." % name)
+            raise SuspiciousOperation(f"Attempted access to '{name}' denied.")
         return os.path.normpath(path)
 
 
